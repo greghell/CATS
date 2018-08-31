@@ -15,7 +15,7 @@ timestr = time.strftime("%Y%m%d-%H%M%S")
 dirname = 'CATS_'+timestr
 os.mkdir(dirname)
 os.chdir(dirname)
-print 'creating log directory ' + os.getcwd()
+print '\ncreating log directory ' + os.getcwd()
 
 # list dibas directories
 print 'processing compute node #' + CompNodeNum[0]
@@ -34,8 +34,10 @@ print 'found ' + str(nEmptyDibas) + ' EMPTY dibas directories'
 
 # search RAW files in dibas directories
 RAWFilList = []
+FILFilList = []
 for dir,_,_ in os.walk('/mnt_blc' + CompNodeNum[0] + '/'):
     RAWFilList.extend(glob(os.path.join(dir,'*.raw')))
+    FILFilList.extend(glob(os.path.join(dir,'*.fil')))
 NumRawFiles = np.size(RAWFilList)   # number of raw files
 RawListLog = 'RawFilesBLC' + CompNodeNum[0] + '.txt'
 DiagRawListLog = 'DiagRawFilesBLC' + CompNodeNum[0] + '.txt'
@@ -109,10 +111,22 @@ guppiFILlist.close()
 guppi_no_FILlist.close()
 
 
+## work on filterbank files
 
-
-
-
+NumFILFiles = np.size(FILFilList)   # number of raw files
+FILListLog = 'FILFilesBLC' + CompNodeNum[0] + '.txt'
+non_blc_FILListLog = 'non_blc_FILFilesBLC' + CompNodeNum[0] + '.txt'
+FILlist = open(FILListLog, 'w')
+non_blc_FILlist = open(non_blc_FILListLog, 'w')
+num_fil_no_blc = 0
+for fil in FILFilList:
+    FILlist.write(fil + '\n')
+    fname = fil.split("/")[-1]
+    if fname[:5] != 'blc' + CompNodeNum[0] and fname[:5] != 'BLC' + CompNodeNum[0]:
+        num_fil_no_blc = num_fil_no_blc+1
+        non_blc_FILlist.write(fil + '\n')
+print str(NumFILFiles) + ' FIL files found on BLC' + CompNodeNum[0] + ' - listed in ' + FILListLog
+print str(num_fil_no_blc) + ' FIL files NOT starting with ~BLC' + CompNodeNum[0] + '~ found on BLC' + CompNodeNum[0] + ' - listed in ' + non_blc_FILListLog
 
 
 
